@@ -10,6 +10,7 @@ use App\Http\Controllers\Panel\TaxiDriverController;
 use App\Http\Controllers\Panel\TaxistationController;
 use App\Http\Controllers\Panel\CustomersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Panel\VideoController;
 
 
 Route::group(['prefix' => '', 'middleware' => ['auth:admin']], function () {
@@ -21,6 +22,12 @@ Route::group(['prefix' => '', 'middleware' => ['auth:admin']], function () {
         Route::get('form/{unique?}', [AdminController::class, 'form'])->name('panel.admin_form');
         Route::post('form/{unique?}', [AdminController::class, 'save'])->name('panel.admin_save');
         Route::delete('delete', [AdminController::class, 'delete'])->name('panel.admin_delete');
+    });
+    route::group(['prefix' => 'video'], function () {
+        Route::any('', [VideoController::class, 'list'])->name('panel.video_list');
+        Route::get('form/{unique?}', [VideoController::class, 'form'])->name('panel.video_form');
+        Route::post('form/{unique?}', [VideoController::class, 'save'])->name('panel.video_save');
+        Route::delete('delete', [VideoController::class, 'delete'])->name('panel.video_delete');
     });
 
 

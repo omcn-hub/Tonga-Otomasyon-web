@@ -302,6 +302,13 @@
                                 <span class="nav-link-text" data-i18n="nav.dashboard">Yöneticiler</span>
                             </a>
                         </li>
+                        <li class="{{ Helpers::activeMenu(['video']) }}">
+                            <a href="{{ route('panel.video_list') }}" title="Videolar"
+                                data-filter-tags="Videolar">
+                                <i class="fal fa-video"></i>
+                                <span class="nav-link-text" data-i18n="nav.dashboard">Videolar</span>
+                            </a>
+                        </li>
                     </ul>
                     <div class="filter-message js-filter-message bg-success-600"></div>
                 </nav>
