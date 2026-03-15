@@ -25,6 +25,7 @@ Route::group(['prefix' => '', 'middleware' => ['auth:admin']], function () {
     });
     route::group(['prefix' => 'video'], function () {
         Route::any('', [VideoController::class, 'list'])->name('panel.video_list');
+        Route::get('live-logs', [VideoController::class, 'getLiveLogs'])->name('panel.video_live_logs');
         Route::get('form/{unique?}', [VideoController::class, 'form'])->name('panel.video_form');
         Route::post('form/{unique?}', [VideoController::class, 'save'])->name('panel.video_save');
         Route::delete('delete', [VideoController::class, 'delete'])->name('panel.video_delete');

@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+girdiler/
+ciktilar/
+arkaplanlar/
+*.mp4
+*.mp3
+*.m4a
+*.jpg
+*.png
+token.json
+client_secrets.json
+*.json

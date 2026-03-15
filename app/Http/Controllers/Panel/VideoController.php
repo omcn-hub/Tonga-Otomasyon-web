@@ -85,4 +85,66 @@ class VideoController extends BaseController
 
         return $params;
     }
+
+    /**
+     * Veritabanına kayıt atıldıktan SONRA (veya güncellendikten sonra) çalışan kanca.
+     * Bu sayede yeni oluşturulan ID'ye erişebilir ve Python'a gönderebiliriz.
+     */
+    public function saveBack($obj)
+    {
+        // Yalnızca yeni yüklenen ve statüsü "bekliyor" olanlar için tetikle.
+        if ($obj->status === 'bekliyor') {
+            // Python projesinin bulunduğu klasör (Laravel projesinin içindeki Engine klasörü)
+            $enginePath = base_path('Engine');
+            
+            // Python sanal ortam (venv) içindeki python.exe yolu
+            $pythonExe = $enginePath . DIRECTORY_SEPARATOR . 'venv' . DIRECTORY_SEPARATOR . 'Scripts' . DIRECTORY_SEPARATOR . 'python.exe';
+            
+            // Çalıştırılacak yeni wrapper script
+            $scriptPath = $enginePath . DIRECTORY_SEPARATOR . 'run_task.py';
+            
+            // Komutu oluştur. Laragon/Windows için arkaplanda çalıştırma:
+            // start /B: Arka planda yeni pencere açmadan çalıştır
+            // cmd /S /C: Komutu çalıştırıp kapanacak
+            // "" ile python exe veya script yollarında boşluk varsa hata vermesini önlüyoruz
+            // Not: Python'un doğru kütüphaneleri (genai vb.) bulabilmesi ve local dizinleri görebilmesi için
+            // cd ile Engine dizinine geçip ondan sonra python'u çalıştırıyoruz.
+            $command = "start /B cmd /S /C \"cd \"$enginePath\" && \"$pythonExe\" \"$scriptPath\" {$obj->id}\"";
+
+            // Asenkron olarak cmd başlat
+            pclose(popen($command, "r"));
+        }
+
+        // BaseController'daki default yönlendirmeyi manuel yapıyoruz çünkü saveBack return'ü controller'dan döner.
+        return redirect()->route("panel." . $this->page . "_list")->with('success', 'Video başarıyla yüklendi, yapay zeka arka planda işleme başladı!');
+    }
+
+    /**
+     * list.blade.php tarafından 5 saniyede bir çağrılarak Python güncellemelerini alır.
+     */
+    public function getLiveLogs(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids)) {
+            return response()->json([]);
+        }
+
+        $videos = Video::whereIn('id', $ids)->get(['id', 'status', 'error_log', 'video_path']);
+        
+        $data = [];
+        foreach ($videos as $video) {
+            // Logların son satırını al (veya tümünü array olarak döndür)
+            $logLines = array_filter(explode("\n", $video->error_log ?? ''));
+            $lastLog = end($logLines) ?: 'Bağlantı kuruluyor...';
+
+            $data[$video->id] = [
+                'status' => $video->status,
+                'last_log' => $lastLog,
+                'video_path' => $video->video_path
+            ];
+        }
+
+        return response()->json($data);
+    }
 }

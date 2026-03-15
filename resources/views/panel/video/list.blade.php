@@ -91,14 +91,33 @@
                 {
                     data: 'status',
                     name: 'status',
-                    className: 'text-center',
-                    render: function(data) {
-                        // YAPAY ZEKA STATÜ RENKLENDİRMESİ
-                        if(data == 'bekliyor') return '<span class="badge badge-secondary" style="font-size:12px;">Bekliyor</span>';
-                        if(data == 'isleniyor') return '<span class="badge badge-warning" style="font-size:12px;">İşleniyor <i class="fal fa-spinner fa-spin"></i></span>';
-                        if(data == 'tamamlandi') return '<span class="badge badge-success" style="font-size:12px;">Tamamlandı</span>';
-                        if(data == 'hata') return '<span class="badge badge-danger" style="font-size:12px;">Hata!</span>';
-                        return data;
+                    className: 'text-center ai-status-cell',
+                    render: function(data, type, row) {
+                        // Hücreyi bulabilmek için id'yi html attribute olarak ekliyoruz
+                        var html = '<div class="ai-status-container" data-id="' + row.id + '" data-status="' + data + '">';
+                        
+                        // YAPAY ZEKA STATÜ RENKLENDİRMESİ VE CANLI LOG EKRANI
+                        if(data == 'bekliyor') {
+                            html += '<span class="badge badge-secondary" style="font-size:12px;">Bekliyor <i class="fal fa-clock"></i></span>';
+                        }
+                        else if(data == 'isleniyor') {
+                            var lastLog = row.error_log ? row.error_log.split('\n').filter(Boolean).pop() : 'Başlatılıyor...';
+                            html += '<span class="badge badge-warning mb-1" style="font-size:12px;">İşleniyor <i class="fal fa-spinner fa-spin"></i></span><br>';
+                            // Canlı Log alanı
+                            html += '<small class="text-muted d-block mt-1 font-italic live-log-text" style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="'+lastLog+'">'+lastLog+'</small>';
+                        }
+                        else if(data == 'tamamlandı') {
+                            html += '<span class="badge badge-success" style="font-size:12px;">Tamamlandı <i class="fal fa-check"></i></span>';
+                        }
+                        else if(data == 'hata') {
+                            html += '<span class="badge badge-danger" style="font-size:12px;">Hata! <i class="fal fa-times"></i></span>';
+                        }
+                        else {
+                            html += data;
+                        }
+                        
+                        html += '</div>';
+                        return html;
                     }
                 },
                 { data: 'created_at', name: 'created_at', className: 'text-center' },
@@ -138,6 +157,48 @@
         });
 
         BaseCRUD.delete("{{ route('panel.' . $container->page . '_delete') }}");
+        
+        // --- CANLI LOG TAKİBİ (AJAX) ---
+        setInterval(function() {
+            var activeIds = [];
+            // Sadece "isleniyor" (veya bekliyor) olan satırların id'lerini topla
+            $('.ai-status-container').each(function() {
+                var status = $(this).attr('data-status');
+                if (status === 'isleniyor' || status === 'bekliyor') {
+                    activeIds.push($(this).attr('data-id'));
+                }
+            });
+
+            if (activeIds.length > 0) {
+                $.ajax({
+                    url: "{{ route('panel.video_live_logs') }}",
+                    type: "GET",
+                    data: { ids: activeIds },
+                    success: function(response) {
+                        $.each(response, function(id, data) {
+                            var container = $('.ai-status-container[data-id="' + id + '"]');
+                            var oldStatus = container.attr('data-status');
+                            
+                            // Eğer durum "tamamlandı" veya "hata" olarak değiştiyse, DataTables sayfasını yenileyebiliriz 
+                            // ya da doğrudan DOM'u güncelleyebiliriz. DOM'u güncellemek sayfayı sarsmaz.
+                            if (data.status !== oldStatus) {
+                                // Status değiştiyse tabloyu ufaktan yenileyelim ki video butonu vb. gelsin
+                                // Ama sayfa başa sıçramasın diye paging false yapabiliriz veya sadece o satırı DataTables API ile güncelleyebiliriz.
+                                // Şimdilik topyekun tablo yenilemesi en temizi (kullanıcıyı rahatsız etmeden arka planda):
+                                $(BaseCRUD.selector).DataTable().ajax.reload(null, false); 
+                            } else if (data.status === 'isleniyor') {
+                                // Sadece log değiştiyse log metnini güncelle
+                                var logEl = container.find('.live-log-text');
+                                if (logEl.length) {
+                                    logEl.text(data.last_log);
+                                    logEl.attr('title', data.last_log);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }, 5000); // 5 saniyede bir kontrol et
     });
 </script>
 @endsection
