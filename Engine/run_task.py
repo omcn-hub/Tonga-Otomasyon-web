@@ -93,7 +93,15 @@ def calistir(video_id):
 
         except Exception as e:
             sys.stdout = db_logger.original_stdout
-            hata_mesaji = f"Hata Oluştu:\n{str(e)}\n\nTeknik Detay:\n{traceback.format_exc()}"
+            
+            # Eski logları al ve hatayı altına ekle ki panelde neyden sonra çöktüğü anlaşılsın
+            mevcut_log = "\n".join(db_logger.logs)
+            hata_mesaji = f"{mevcut_log}\n\n[KRİTİK HATA]: {str(e)}\n\nTeknik Detay:\n{traceback.format_exc()}"
+            
+            # DB boyutunu şişirmemek için son 1000 karakteri alabiliriz
+            if len(hata_mesaji) > 2000:
+                hata_mesaji = "..." + hata_mesaji[-1997:]
+                
             cursor.execute("UPDATE videos SET status = 'hata', error_log = %s WHERE id = %s", (hata_mesaji, video_id))
             db.commit()
 

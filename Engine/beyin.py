@@ -6,7 +6,7 @@ from google.genai import types
 
 # ==========================================
 # BURAYA KENDİ GEMINI API ŞİFRENİ YAPIŞTIR
-GEMINI_API_KEY = "AIzaSyDEwDiSpFmt-_AEWnoNTU8coPc4OWAlMoc"
+GEMINI_API_KEY = "AIzaSyC1J-MNudLfzfXsRD5aQSEyfbdMFwETtDk"
 # ==========================================
 
 client = genai.Client(api_key=GEMINI_API_KEY)

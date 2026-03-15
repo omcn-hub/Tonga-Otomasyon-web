@@ -107,7 +107,7 @@ def videoyu_birlestir(ses_yolu, resim_yollari, cikti_yolu, abone_logosu="abone.p
         goruntu_ciktisi = "[logolu]"
         girdi_index += 1
 
-    filtre_komutlari.append(f"{goruntu_ciktisi}fade=t=in:st=0:d=1,fade=t=out:st={toplam_sure-2}:d=2[nihai_goruntu]")
+    filtre_komutlari.append(f"{goruntu_ciktisi}fps=25,fade=t=out:st={toplam_sure-2}:d=2[nihai_goruntu]")
     goruntu_ciktisi = "[nihai_goruntu]"
 
     if os.path.exists(fon_muzigi):
