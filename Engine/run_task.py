@@ -32,6 +32,9 @@ class DBLogger:
         except UnicodeEncodeError:
             # Windows terminali (cp1254 vb.) emojileri (🚀, vb.) basamazsa hatayı yut
             pass
+        except OSError:
+            # Windows bazen uzun yazılarda Errno 22 Invalid Argument fırlatır
+            pass
         
         # Boş satırları loglama
         msg = message.strip()

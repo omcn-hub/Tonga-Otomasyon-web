@@ -13,6 +13,8 @@ def reels_olustur(girdi_video, cikti_video, baslangic_sn=0, sure_sn=90):
         "-t", str(sure_sn),
         # trunc(ih*9/16/2)*2 → libx264'ün gerektirdiği çift sayılı piksel boyutu (607.5 sorunu giderildi)
         "-vf", "crop=trunc(ih*9/16/2)*2:ih,scale=1080:1920",
+        "-map", "0:v",   # Görüntüyü al
+        "-map", "0:a?",  # Sesi al (varsa)
         "-c:v", "libx264",
         "-crf", "18",            # Yüksek görüntü kalitesi
         "-preset", "fast",
