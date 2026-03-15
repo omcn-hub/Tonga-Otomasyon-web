@@ -111,5 +111,5 @@ def tonga_motorunu_calistir(ses_yolu, ozel_baslik=None):
     print(f"🎉 YAPAY ZEKA MOTORU GÖREVİNİ KUSURSUZ BİTİRDİ!")
     print(f"{'='*70}\n")
     
-    # EN KRİTİK YER: Web sitesine (işçi bota) çıkan MP4 dosyasının tam yerini veriyoruz
-    return os.path.abspath(yatay_video_yolu)
+    # EN KRİTİK YER: Web sitesine (işçi bota) çıkan MP4 dosyasının tam yerini ve YAPAY ZEKA BAŞLIĞINI veriyoruz
+    return os.path.abspath(yatay_video_yolu), youtube_baslik

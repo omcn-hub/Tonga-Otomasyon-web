@@ -82,13 +82,13 @@ def calistir(video_id):
 
         try:
             # === YAPAY ZEKA MOTORU BAŞLATILIYOR ===
-            cikti_video_yolu = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=ozel_baslik)
+            cikti_video_yolu, donen_baslik = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=ozel_baslik)
             cikti_video_yolu = cikti_video_yolu.replace("\\", "/")
 
             # İş bitti, durumu güncelle
             # Stdout'u geri al ki sql update sırasında gereksiz log yazılmasın
             sys.stdout = db_logger.original_stdout
-            cursor.execute("UPDATE videos SET status = 'tamamlandı', video_path = %s, error_log = 'Tamamlandı.' WHERE id = %s", (cikti_video_yolu, video_id))
+            cursor.execute("UPDATE videos SET status = 'tamamlandı', video_path = %s, title = %s, error_log = 'Tamamlandı.' WHERE id = %s", (cikti_video_yolu, donen_baslik, video_id))
             db.commit()
 
         except Exception as e:

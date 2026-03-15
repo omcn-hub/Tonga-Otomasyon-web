@@ -84,7 +84,9 @@ def videoyu_birlestir(ses_yolu, resim_yollari, cikti_yolu, abone_logosu="abone.p
             
         son_resim = resim_yollari[-1].replace("\\", "/")
         f.write(f"file '{son_resim}'\n")
-        
+        f.write(f"duration {resim_basina_sure}\n")
+        # FFmpeg concat requires the last file to be repeated without a duration to ensure the last duration is actually applied
+        f.write(f"file '{son_resim}'\n")
     komut = [
         FFMPEG_EXE, "-y",
         "-f", "concat", "-safe", "0", "-i", liste_dosyasi,
