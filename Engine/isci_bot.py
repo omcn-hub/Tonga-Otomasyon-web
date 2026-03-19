@@ -1,14 +1,19 @@
+import os
+import sys
 import mysql.connector
 import time
-import os
+from dotenv import load_dotenv
 import main
+
+# .env dosyasını yükle
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # LARAGON VERİTABANI AYARLARIN
 DB_AYARLARI = {
-    'host': 'localhost',
-    'user': 'root', # Laragon varsayılan kullanıcısı
-    'password': '', # Laragon'da şifre genelde boştur
-    'database': 'automation_web' # Kendi veritabanı adını buraya yaz (tonga_db veya ne koyduysan)
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'user': os.environ.get('DB_USERNAME', 'root'),
+    'password': os.environ.get('DB_PASSWORD', ''),
+    'database': os.environ.get('DB_DATABASE', 'automation_web')
 }
 
 def is_var_mi_kontrol_et():
@@ -42,13 +47,21 @@ def is_var_mi_kontrol_et():
                 print(f"[İŞÇİ] {ses_yolu} dosyası Yapay Zeka Motoruna gönderiliyor...")
                 
                 # Hem sesi veriyoruz, hem de eğer panelden girildiyse o özel başlığı veriyoruz
-                cikti_video_yolu = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=is_kaydi.get('title'))
+                cikti = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=is_kaydi.get('title'))
                 
+                # main.tonga_motorunu_calistir bir tuple dönüyor olabilir (cikti_video_yolu, donen_baslik)
+                if isinstance(cikti, tuple):
+                    cikti_video_yolu = cikti[0]
+                    donen_baslik = cikti[1]
+                else:
+                    cikti_video_yolu = cikti
+                    donen_baslik = is_kaydi.get('title')
+
                 # Yollardaki \ işaretlerini / ile değiştirelim (Windows Laravel sorunu olmasın)
                 cikti_video_yolu = cikti_video_yolu.replace("\\", "/")
 
                 # 2. İş Bitti! Panele Haber Ver: "Videoyu Jilet Gibi Teslim Ettim!"
-                cursor.execute("UPDATE videos SET status = 'tamamlandı', video_path = %s WHERE id = %s", (cikti_video_yolu, is_id))
+                cursor.execute("UPDATE videos SET status = 'tamamlandı', video_path = %s, title = %s WHERE id = %s", (cikti_video_yolu, donen_baslik, is_id))
                 db.commit()
                 print(f"[BAŞARILI] Görev {is_id} tamamlandı! Panelde yeşil ışık yandı.")
 

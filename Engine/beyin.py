@@ -5,8 +5,8 @@ from google import genai
 from google.genai import types
 
 # ==========================================
-# BURAYA KENDİ GEMINI API ŞİFRENİ YAPIŞTIR
-GEMINI_API_KEY = "AIzaSyC1J-MNudLfzfXsRD5aQSEyfbdMFwETtDk"
+# API anahtarı .env dosyasından okunuyor
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyAd57vghf42Ilhhid5uw0KxJ1h3BAeR2aE")
 # ==========================================
 
 client = genai.Client(api_key=GEMINI_API_KEY)

@@ -3,16 +3,20 @@ import mysql.connector
 import os
 import json
 import traceback
+from dotenv import load_dotenv
+
+# .env dosyasını yükle
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Laravel'in Engine klasörü içindeyiz, main.py ile aynı dizin
 import main
 
 # LARAGON VERİTABANI AYARLARI
 DB_AYARLARI = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'automation_web' # isci_bot.py'deki veritabanı adı
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'user': os.environ.get('DB_USERNAME', 'root'),
+    'password': os.environ.get('DB_PASSWORD', ''),
+    'database': os.environ.get('DB_DATABASE', 'automation_web')
 }
 
 class DBLogger:
@@ -70,6 +74,10 @@ def calistir(video_id):
         if not is_kaydi:
             print(f"Hata: Veritabanında ID {video_id} bulunamadı.")
             return
+        
+        # Eğer durum zaten tamamlandı ise tekrar çalıştırma (isteğe bağlı)
+        # if is_kaydi['status'] == 'tamamlandı':
+        #     return
 
         # Durumu işleniyor yap
         cursor.execute("UPDATE videos SET status = 'isleniyor', error_log = 'Araçlar hazırlanıyor...' WHERE id = %s", (video_id,))
@@ -85,7 +93,15 @@ def calistir(video_id):
 
         try:
             # === YAPAY ZEKA MOTORU BAŞLATILIYOR ===
-            cikti_video_yolu, donen_baslik = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=ozel_baslik)
+            cikti = main.tonga_motorunu_calistir(ses_yolu, ozel_baslik=ozel_baslik)
+            
+            if isinstance(cikti, tuple):
+                cikti_video_yolu = cikti[0]
+                donen_baslik = cikti[1]
+            else:
+                cikti_video_yolu = cikti
+                donen_baslik = ozel_baslik
+
             cikti_video_yolu = cikti_video_yolu.replace("\\", "/")
 
             # İş bitti, durumu güncelle
