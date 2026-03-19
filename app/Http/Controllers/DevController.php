@@ -48,11 +48,11 @@ class DevController extends Controller
 
     public function cacheall(Request $request)
     { 
-        // $servers = array(
-        //     '10.1.1.171',
-        //     '10.1.1.172',
-        //     '10.1.1.173', 
-        // );
+        $servers = array(
+            '10.1.1.171',
+            '10.1.1.172',
+            '10.1.1.173',
+        );
 
         foreach ($servers as $ip)
         {
@@ -75,11 +75,11 @@ class DevController extends Controller
 
     public function oneclick(Request $request)
     {   
-        // $servers = array(
-        //     '10.1.1.171',
-        //     '10.1.1.172',
-        //     '10.1.1.173', 
-        // );
+        $servers = array(
+            '10.1.1.171',
+            '10.1.1.172',
+            '10.1.1.173',
+        );
 
         foreach ($servers as $ip)
         {
