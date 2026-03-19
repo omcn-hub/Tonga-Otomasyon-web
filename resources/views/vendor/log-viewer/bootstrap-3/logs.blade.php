@@ -105,7 +105,7 @@
             $("a[href=#delete-log-modal]").on('click', function(event) {
                 event.preventDefault();
                 var date    = $(this).data('log-date'),
-                    message = "@lang('Are you sure you want to DELETE this log file: :date ?')";
+                    message = "{{ __('Are you sure you want to DELETE this log file: :date ?') }}";
 
                 deleteLogForm.find('input[name=date]').val(date);
                 deleteLogModal.find('.modal-body p').html(message.replace(':date', date));

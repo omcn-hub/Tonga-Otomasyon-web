@@ -92,7 +92,7 @@
                                 <span class="input-group-btn">
                                     @unless (is_null($query))
                                         <a href="{{ route('log-viewer::logs.show', [$log->date]) }}" class="btn btn-default">
-                                            (@lang(':count results', ['count' => $entries->count()])) <span class="glyphicon glyphicon-remove"></span>
+                                            ({{ __(':count results', ['count' => $entries->count()]) }}) <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     @endunless
                                     <button id="search-btn" class="btn btn-primary">

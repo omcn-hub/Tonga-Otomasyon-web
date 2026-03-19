@@ -26,11 +26,11 @@ class DevController extends Controller
 
     public function pull(Request $request)
     { 
-        // $hooks = array(
-        //     '10.1.1.171' => 'https://focused-elgamal.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=f0bab948-c491-a02a-5f87-2dcc21f2a76d',
-        //     '10.1.1.172' => 'https://inspiring-haibt.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=d4e39605-05a9-e969-f2d0-3eb754e77b1e',
-        //     '10.1.1.173' => 'https://busy-babbage.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=a93b4dd8-839f-778f-5eaf-3de751db4bc6', 
-        // );
+        $hooks = array(
+            '10.1.1.171' => 'https://focused-elgamal.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=f0bab948-c491-a02a-5f87-2dcc21f2a76d',
+            '10.1.1.172' => 'https://inspiring-haibt.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=d4e39605-05a9-e969-f2d0-3eb754e77b1e',
+            '10.1.1.173' => 'https://busy-babbage.213-74-184-66.plesk.page:8443/modules/git/public/web-hook.php?uuid=a93b4dd8-839f-778f-5eaf-3de751db4bc6', 
+        );
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $hooks[$_SERVER['SERVER_ADDR']]);

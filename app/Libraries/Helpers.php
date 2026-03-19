@@ -134,9 +134,7 @@ class Helpers
         } catch (\Throwable $th) {
             $quer["err"] =  $th->getMessage();
             Helpers::logInsert("SMS", $telefon, $quer, 999, $ip, $user_agent);
-            return 999;
         }
-        return 999;
     }
 
     public static function JsonWarning($message)
